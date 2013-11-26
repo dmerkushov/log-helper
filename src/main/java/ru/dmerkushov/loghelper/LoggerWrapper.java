@@ -27,7 +27,7 @@ import org.w3c.dom.NodeList;
  * Logger logger = loggerWrapper.getLogger ();
  * </code>
  *
- * @author shandr
+ * @author Dmitriy Merkushov
  * @see java.util.logging.Logger
  */
 public class LoggerWrapper {

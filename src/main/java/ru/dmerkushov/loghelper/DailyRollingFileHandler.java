@@ -16,7 +16,7 @@ import java.util.logging.StreamHandler;
 /**
  * Simple daily rolling file handler
  *
- * @author shandr
+ * @author Dmitriy Merkushov
  * @version 0.0 NOT TESTED!
  */
 public class DailyRollingFileHandler extends StreamHandler {

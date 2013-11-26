@@ -8,7 +8,7 @@ import java.util.logging.Level;
 
 /**
  *
- * @author shandr
+ * @author Dmitriy Merkushov
  */
 public class Log4jAppenderForLoggerWrapper extends org.apache.log4j.AppenderSkeleton {
 

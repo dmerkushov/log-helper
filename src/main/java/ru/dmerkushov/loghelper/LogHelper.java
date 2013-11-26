@@ -10,7 +10,7 @@ import java.util.Properties;
 
 /**
  * @deprecated Use the LoggerWrapper class instead
- * @author shandr
+ * @author Dmitriy Merkushov
  * @see LoggerWrapper
  */
 public class LogHelper {

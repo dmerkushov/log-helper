@@ -10,7 +10,7 @@ import java.util.logging.LogRecord;
 
 /**
  *
- * @author shandr
+ * @author Dmitriy Merkushov
  */
 public class LoggerFormatter extends Formatter {
 

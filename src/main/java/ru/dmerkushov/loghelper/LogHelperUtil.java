@@ -6,7 +6,7 @@ package ru.dmerkushov.loghelper;
 
 /**
  *
- * @author shandr
+ * @author Dmitriy Merkushov
  */
 public class LogHelperUtil {
 

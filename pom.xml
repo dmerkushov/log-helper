@@ -4,11 +4,11 @@
 
   <groupId>ru.dmerkushov</groupId>
   <artifactId>log-helper</artifactId>
-  <version>1.4.0</version>
+  <version>1.4.1</version>
   <packaging>jar</packaging>
 
   <name>log-helper</name>
-  <url>http://maven.apache.org</url>
+  <url>http://dmerkushov.ru</url>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -24,7 +24,7 @@
     <dependency>
       <groupId>log4j</groupId>
       <artifactId>log4j</artifactId>
-      <version>1.2.17</version>
+      <version>[1.2.17,)</version>
     </dependency>
   </dependencies>
 </project>
