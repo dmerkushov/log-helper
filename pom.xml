@@ -28,10 +28,10 @@
     </dependency>
   </dependencies>
   
-  <repositories>
+  <distributionManagement>
 	  <repository>
 		  <id>sonatype</id>
 		  <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
 	  </repository>
-  </repositories>
+  </distributionManagement>
 </project>
