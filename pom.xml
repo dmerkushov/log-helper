@@ -1,37 +1,64 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
 
-  <groupId>ru.dmerkushov</groupId>
-  <artifactId>log-helper</artifactId>
-  <version>1.4.1</version>
-  <packaging>jar</packaging>
+	<groupId>ru.dmerkushov</groupId>
+	<artifactId>log-helper</artifactId>
+	<version>1.4.1-SNAPSHOT</version>
+	<packaging>jar</packaging>
 
-  <name>log-helper</name>
-  <url>http://dmerkushov.ru</url>
+	<name>log-helper</name>
+	<description>A library to help use java.util.logging (JUL)</description>
+	<url>http://dmerkushov.ru</url>
 
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
 
-  <dependencies>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>3.8.1</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>log4j</groupId>
-      <artifactId>log4j</artifactId>
-      <version>[1.2.17,)</version>
-    </dependency>
-  </dependencies>
+	<licenses>
+		<license>
+			<name>The Apache Software License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+
+	<scm>
+		<url>https://github.com/dmerkushov/log-helper</url>
+		<connection>scm:git:https://github.com/dmerkushov/log-helper.git</connection>
+	</scm>
   
-  <distributionManagement>
-	  <repository>
-		  <id>sonatype</id>
-		  <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
-	  </repository>
-  </distributionManagement>
+	<developers>
+		<developer>
+			<id>owner</id>
+			<name>Dmitriy Merkushov</name>
+			<email>d.merkushov@gmail.com</email>
+			<timezone>UTC+4</timezone>
+		</developer>
+	</developers>
+
+	<dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>3.8.1</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<version>[1.2.17,)</version>
+		</dependency>
+	</dependencies>
+  
+	<distributionManagement>
+		<snapshotRepository>			
+			<id>sonatype</id>
+			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+		</snapshotRepository>
+		<repository>
+			<id>sonatype</id>
+			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+		</repository>
+	</distributionManagement>
 </project>
