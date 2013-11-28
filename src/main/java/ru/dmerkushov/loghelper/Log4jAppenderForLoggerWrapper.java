@@ -33,22 +33,7 @@ public class Log4jAppenderForLoggerWrapper extends org.apache.log4j.AppenderSkel
 		}
 
 		org.apache.log4j.Level level = event.getLevel ();
-		int log4jLevelInt = level.toInt ();
-		Level julLevel = Level.SEVERE;
-
-		if (log4jLevelInt >= org.apache.log4j.Level.FATAL_INT) {
-			julLevel = Level.SEVERE;
-		} else if (log4jLevelInt >= org.apache.log4j.Level.ERROR_INT) {
-			julLevel = Level.SEVERE;
-		} else if (log4jLevelInt >= org.apache.log4j.Level.WARN_INT) {
-			julLevel = Level.WARNING;
-		} else if (log4jLevelInt >= org.apache.log4j.Level.INFO_INT) {
-			julLevel = Level.INFO;
-		} else if (log4jLevelInt >= org.apache.log4j.Level.DEBUG_INT) {
-			julLevel = Level.FINE;
-		} else if (log4jLevelInt >= org.apache.log4j.Level.TRACE_INT) {
-			julLevel = Level.FINER;
-		}
+		Level julLevel = LoggerWrapper.getJULLevelFromLog4j (level);
 
 		loggerWrapper.getLogger ().logp (julLevel, className, methodName, msg);
 	}

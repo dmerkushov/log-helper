@@ -27,7 +27,7 @@ import org.w3c.dom.NodeList;
  * Logger logger = loggerWrapper.getLogger ();
  * </code>
  *
- * @author Dmitriy Merkushov
+ * @author shandr
  * @see java.util.logging.Logger
  */
 public class LoggerWrapper {
@@ -36,16 +36,17 @@ public class LoggerWrapper {
 	org.apache.log4j.Logger log4jLogger;
 	Log4jAppenderForLoggerWrapper log4jAppender;
 	static HashMap<String, LoggerWrapper> wrappers = new HashMap<String, LoggerWrapper> ();
+	Level defaultLevel = Level.ALL;
 
 	private LoggerWrapper (String name) {
 		logger = Logger.getLogger (name);
-		logger.setLevel (Level.ALL);
+		logger.setLevel (defaultLevel);
 
 		log4jLogger = org.apache.log4j.Logger.getLogger (name);
 		log4jLogger.removeAllAppenders ();
 		log4jAppender = new Log4jAppenderForLoggerWrapper (this);
 		log4jLogger.addAppender (log4jAppender);
-		log4jLogger.setLevel (org.apache.log4j.Level.ALL);
+		log4jLogger.setLevel (getLog4jLevelFromJUL (defaultLevel));
 	}
 
 	/**
@@ -258,7 +259,7 @@ public class LoggerWrapper {
 			}
 
 			if (fh != null) {
-				fh.setLevel (Level.ALL);
+				fh.setLevel (defaultLevel);
 				fh.setFormatter (new LoggerFormatter ());
 				logger.addHandler (fh);
 				isSuccess = true;
@@ -282,7 +283,7 @@ public class LoggerWrapper {
 	public void addConsoleHandler () {
 		ConsoleHandler ch = null;
 		ch = new ConsoleHandler ();
-		ch.setLevel (Level.ALL);
+		ch.setLevel (defaultLevel);
 		ch.setFormatter (new LoggerFormatter ());
 		logger.addHandler (ch);
 	}
@@ -602,5 +603,68 @@ public class LoggerWrapper {
 	 */
 	public boolean isLoggable (Level level) {
 		return logger.isLoggable (level);
+	}
+	
+	/**
+	 * Set this level for all configured loggers
+	 * @param level 
+	 */
+	public void setLevel (Level level) {
+		
+		this.defaultLevel = level;
+		logger.setLevel (level);
+		for (Handler handler: logger.getHandlers ()) {
+			handler.setLevel (level);
+		}
+		
+		log4jLogger.setLevel (getLog4jLevelFromJUL (level));
+		
+	}
+	
+	/**
+	 * Get a Log4j logging level the same as given JUL level
+	 * @param level
+	 * @return 
+	 */
+	public static org.apache.log4j.Level getLog4jLevelFromJUL (java.util.logging.Level level) {
+		org.apache.log4j.Level log4jLevel;
+		if ((level.intValue () >= Level.SEVERE.intValue ()) && (level.intValue () < Level.OFF.intValue ())) {
+			log4jLevel = org.apache.log4j.Level.ERROR;
+		} else if (level.intValue () >= Level.WARNING.intValue ()) {
+			log4jLevel = org.apache.log4j.Level.WARN;
+		} else if (level.intValue () >= Level.INFO.intValue ()) {
+			log4jLevel = org.apache.log4j.Level.INFO;
+		} else if (level.intValue () >= Level.CONFIG.intValue ()) {
+			log4jLevel = org.apache.log4j.Level.DEBUG;
+		} else if (level.intValue () >= Level.FINEST.intValue ()) {
+			log4jLevel = org.apache.log4j.Level.TRACE;
+		} else if (level.intValue () < Level.FINEST.intValue ()) {
+			log4jLevel = org.apache.log4j.Level.ALL;
+		} else {
+			log4jLevel = org.apache.log4j.Level.OFF;
+		}
+		return log4jLevel;
+	}
+	
+	public static Level getJULLevelFromLog4j (org.apache.log4j.Level log4jLevel) {
+		int log4jLevelInt = log4jLevel.toInt ();
+		Level julLevel;
+		if (log4jLevelInt >= org.apache.log4j.Level.FATAL_INT) {
+			julLevel = Level.SEVERE;
+		} else if (log4jLevelInt >= org.apache.log4j.Level.ERROR_INT) {
+			julLevel = Level.SEVERE;
+		} else if (log4jLevelInt >= org.apache.log4j.Level.WARN_INT) {
+			julLevel = Level.WARNING;
+		} else if (log4jLevelInt >= org.apache.log4j.Level.INFO_INT) {
+			julLevel = Level.INFO;
+		} else if (log4jLevelInt >= org.apache.log4j.Level.DEBUG_INT) {
+			julLevel = Level.FINE;
+		} else if (log4jLevelInt >= org.apache.log4j.Level.TRACE_INT) {
+			julLevel = Level.FINER;
+		} else {
+			julLevel = Level.FINEST;
+		}
+
+		return julLevel;
 	}
 }
