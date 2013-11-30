@@ -16,24 +16,30 @@ public class LoggerFormatter extends Formatter {
 
 	static SimpleDateFormat sdf = new SimpleDateFormat ("yyyy-MM-dd HH:mm:ss.S Z");
 
+	/**
+	 * Format a logging message
+	 *
+	 * @param logRecord
+	 * @return
+	 */
 	@Override
-	public String format (LogRecord record) {
+	public String format (LogRecord logRecord) {
 		StringBuilder resultBuilder = new StringBuilder ();
-		String prefix = record.getLevel ().getName () + "\t";
+		String prefix = logRecord.getLevel ().getName () + "\t";
 
 		resultBuilder.append (prefix);
 
 		resultBuilder.append (Thread.currentThread ().getName ())
 				.append (" ")
-				.append (sdf.format (new java.util.Date (record.getMillis ())))
+				.append (sdf.format (new java.util.Date (logRecord.getMillis ())))
 				.append (": ")
-				.append (record.getSourceClassName ())
+				.append (logRecord.getSourceClassName ())
 				.append (":")
-				.append (record.getSourceMethodName ())
+				.append (logRecord.getSourceMethodName ())
 				.append ("(): ")
-				.append (record.getMessage ());
+				.append (logRecord.getMessage ());
 
-		Object[] params = record.getParameters ();
+		Object[] params = logRecord.getParameters ();
 		if (params != null) {
 			resultBuilder.append ("\nParameters:");
 
@@ -61,57 +67,14 @@ public class LoggerFormatter extends Formatter {
 			}
 		}
 
-		Throwable t = record.getThrown ();
+		Throwable t = logRecord.getThrown ();
 		if (t != null) {
 			resultBuilder.append ("\nThrowing:\n")
-					.append (getFullThrowableMsg (t));
+					.append (LoggerWrapper.getFullThrowableMsg (t));
 		}
 
 		String result = resultBuilder.toString ().replaceAll ("\n", "\n" + prefix) + "\n";
 
 		return result;
-	}
-
-	public static String getFullThrowableMsg (Throwable t) {
-		StringBuilder resultBuilder = new StringBuilder ();
-		resultBuilder.append (t.getClass ().getCanonicalName ())
-				.append (": ")
-				.append (t.getMessage ());
-
-		StackTraceElement[] stackTraceElements = t.getStackTrace ();
-
-		if (stackTraceElements != null) {
-			if (stackTraceElements.length > 0) {
-				resultBuilder.append ("\nStack Trace:\n");
-
-				StackTraceElement stackTraceElement = stackTraceElements[0];
-				resultBuilder.append ("\t")
-						.append (stackTraceElement.getClassName ())
-						.append (":")
-						.append (stackTraceElement.getMethodName ())
-						.append ("():")
-						.append (stackTraceElement.getLineNumber ());
-
-				for (int i = 1; i < stackTraceElements.length; i++) {
-					stackTraceElement = stackTraceElements[i];
-					resultBuilder.append ("\n\tat ")
-							.append (stackTraceElement.getClassName ())
-							.append (":")
-							.append (stackTraceElement.getMethodName ())
-							.append ("():")
-							.append (stackTraceElement.getLineNumber ());
-				}
-			}
-		}
-
-		Throwable cause = t.getCause ();
-
-		if (cause != null) {
-			resultBuilder.append ("\nCaused by:\n")
-					.append (getFullThrowableMsg (cause));
-		}
-
-		String fullThrowableMsg = resultBuilder.toString ();
-		return fullThrowableMsg;
 	}
 }

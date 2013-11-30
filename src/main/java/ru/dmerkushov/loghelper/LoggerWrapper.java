@@ -667,4 +667,54 @@ public class LoggerWrapper {
 
 		return julLevel;
 	}
+
+	/**
+	 * Get a full message of a throwable: its message, stack trace, and causes
+	 * (other Throwables, also described recursively)
+	 *
+	 * @param throwable
+	 * @return
+	 */
+	public static String getFullThrowableMsg (Throwable throwable) {
+		StringBuilder resultBuilder = new StringBuilder ();
+		resultBuilder.append (throwable.getClass ().getCanonicalName ())
+				.append (": ")
+				.append (throwable.getMessage ());
+
+		StackTraceElement[] stackTraceElements = throwable.getStackTrace ();
+
+		if (stackTraceElements != null) {
+			if (stackTraceElements.length > 0) {
+				resultBuilder.append ("\nStack Trace:\n");
+
+				StackTraceElement stackTraceElement = stackTraceElements[0];
+				resultBuilder.append ("\t")
+						.append (stackTraceElement.getClassName ())
+						.append (":")
+						.append (stackTraceElement.getMethodName ())
+						.append ("():")
+						.append (stackTraceElement.getLineNumber ());
+
+				for (int i = 1; i < stackTraceElements.length; i++) {
+					stackTraceElement = stackTraceElements[i];
+					resultBuilder.append ("\n\tat ")
+							.append (stackTraceElement.getClassName ())
+							.append (":")
+							.append (stackTraceElement.getMethodName ())
+							.append ("():")
+							.append (stackTraceElement.getLineNumber ());
+				}
+			}
+		}
+
+		Throwable cause = throwable.getCause ();
+
+		if (cause != null) {
+			resultBuilder.append ("\nCaused by:\n")
+					.append (getFullThrowableMsg (cause));
+		}
+
+		String fullThrowableMsg = resultBuilder.toString ();
+		return fullThrowableMsg;
+	}
 }
