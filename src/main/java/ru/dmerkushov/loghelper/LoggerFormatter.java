@@ -72,7 +72,7 @@ public class LoggerFormatter extends Formatter {
 		return result;
 	}
 
-	private static String getFullThrowableMsg (Throwable t) {
+	public static String getFullThrowableMsg (Throwable t) {
 		StringBuilder resultBuilder = new StringBuilder ();
 		resultBuilder.append (t.getClass ().getCanonicalName ())
 				.append (": ")
