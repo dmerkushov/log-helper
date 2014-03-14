@@ -274,8 +274,6 @@ public class LoggerWrapper {
 	/**
 	 * Add a console handler to the linked logger with ALL logging level
 	 *
-	 * @param filenamePattern the filename pattern as in FileHandler constructor
-	 * @return <code>true</code> if success, <code>false</code> otherwise
 	 * @see FileHandler
 	 * @see FileHandler#FileHandler(java.lang.String)
 	 * @see Level#ALL
@@ -387,13 +385,18 @@ public class LoggerWrapper {
 	 * processed specially by output Formatters and is not treated as a
 	 * formatting parameter to the LogRecord message property. <p>
 	 *
-	 * @param thrown The Throwable that is being thrown.
+	 * @param t The Throwable that is being thrown.
 	 * @see Logger#throwing(java.lang.String, java.lang.String,
 	 * java.lang.Throwable)
 	 */
 	public void throwing (Throwable t) {
 		StackTraceElement caller = LogHelperUtil.getCallerStackTraceElement ();
-		logger.throwing (caller.getClassName (), caller.getMethodName (), t);
+		if (caller != null) {
+			logger.throwing (caller.getClassName (), caller.getMethodName () + "():" + caller.getLineNumber (), t);
+		} else {
+			logger.throwing ("(UnknownSourceClass)", "(unknownSourceMethod)", t);
+		}
+		
 	}
 
 	/**
@@ -406,7 +409,7 @@ public class LoggerWrapper {
 	 * a formatting parameter to the LogRecord message property. <p>
 	 *
 	 * @param msg The string message (or a key in the message catalog)
-	 * @param thrown Throwable associated with log message.
+	 * @param t Throwable associated with log message.
 	 * @see Logger#throwing(java.lang.String, java.lang.String,
 	 * java.lang.Throwable)
 	 * @see Logger#logp(java.util.logging.Level, java.lang.String,
@@ -414,7 +417,11 @@ public class LoggerWrapper {
 	 */
 	public void throwing (String msg, Throwable t) {
 		StackTraceElement caller = LogHelperUtil.getCallerStackTraceElement ();
-		logger.logp (Level.FINER, caller.getClassName (), caller.getMethodName (), msg, t);
+		if (caller != null) {
+			logger.logp (Level.FINER, caller.getClassName (), caller.getMethodName () + "():" + caller.getLineNumber (), msg, t);
+		} else {
+			logger.logp (Level.FINER, "(UnknownSourceClass)", "(unknownSourceMethod)", msg, t);
+		}
 	}
 
 	/**
@@ -423,12 +430,15 @@ public class LoggerWrapper {
 	 * level then the given message is forwarded to all the registered output
 	 * Handler objects. <p>
 	 *
-	 * @param level One of the message level identifiers, e.g., SEVERE
 	 * @param msg The string message (or a key in the message catalog)
 	 */
 	public void severe (String msg) {
 		StackTraceElement caller = LogHelperUtil.getCallerStackTraceElement ();
-		logger.logp (Level.SEVERE, caller.getClassName (), caller.getMethodName (), msg);
+		if (caller != null) {
+			logger.logp (Level.SEVERE, caller.getClassName (), caller.getMethodName () + "():" + caller.getLineNumber (), msg);
+		} else {
+			logger.logp (Level.SEVERE, "(UnknownSourceClass)", "(unknownSourceMethod)", msg);
+		}
 	}
 
 	/**
@@ -437,12 +447,15 @@ public class LoggerWrapper {
 	 * level then the given message is forwarded to all the registered output
 	 * Handler objects. <p>
 	 *
-	 * @param level One of the message level identifiers, e.g., SEVERE
 	 * @param msg The string message (or a key in the message catalog)
 	 */
 	public void warning (String msg) {
 		StackTraceElement caller = LogHelperUtil.getCallerStackTraceElement ();
-		logger.logp (Level.WARNING, caller.getClassName (), caller.getMethodName (), msg);
+		if (caller != null) {
+			logger.logp (Level.WARNING, caller.getClassName (), caller.getMethodName () + "():" + caller.getLineNumber (), msg);
+		} else {
+			logger.logp (Level.WARNING, "(UnknownSourceClass)", "(unknownSourceMethod)", msg);
+		}
 	}
 
 	/**
@@ -451,12 +464,15 @@ public class LoggerWrapper {
 	 * level then the given message is forwarded to all the registered output
 	 * Handler objects. <p>
 	 *
-	 * @param level One of the message level identifiers, e.g., SEVERE
 	 * @param msg The string message (or a key in the message catalog)
 	 */
 	public void info (String msg) {
 		StackTraceElement caller = LogHelperUtil.getCallerStackTraceElement ();
-		logger.logp (Level.INFO, caller.getClassName (), caller.getMethodName (), msg);
+		if (caller != null) {
+			logger.logp (Level.INFO, caller.getClassName (), caller.getMethodName () + "():" + caller.getLineNumber (), msg);
+		} else {
+			logger.logp (Level.INFO, "(UnknownSourceClass)", "(unknownSourceMethod)", msg);
+		}
 	}
 
 	/**
@@ -469,7 +485,11 @@ public class LoggerWrapper {
 	 */
 	public void config (String msg) {
 		StackTraceElement caller = LogHelperUtil.getCallerStackTraceElement ();
-		logger.logp (Level.CONFIG, caller.getClassName (), caller.getMethodName (), msg);
+		if (caller != null) {
+			logger.logp (Level.CONFIG, caller.getClassName (), caller.getMethodName () + "():" + caller.getLineNumber (), msg);
+		} else {
+			logger.logp (Level.CONFIG, "(UnknownSourceClass)", "(unknownSourceMethod)", msg);
+		}
 	}
 
 	/**
@@ -482,7 +502,11 @@ public class LoggerWrapper {
 	 */
 	public void fine (String msg) {
 		StackTraceElement caller = LogHelperUtil.getCallerStackTraceElement ();
-		logger.logp (Level.FINE, caller.getClassName (), caller.getMethodName (), msg);
+		if (caller != null) {
+			logger.logp (Level.FINE, caller.getClassName (), caller.getMethodName () + "():" + caller.getLineNumber (), msg);
+		} else {
+			logger.logp (Level.FINE, "(UnknownSourceClass)", "(unknownSourceMethod)", msg);
+		}
 	}
 
 	/**
@@ -495,7 +519,11 @@ public class LoggerWrapper {
 	 */
 	public void finer (String msg) {
 		StackTraceElement caller = LogHelperUtil.getCallerStackTraceElement ();
-		logger.logp (Level.FINER, caller.getClassName (), caller.getMethodName (), msg);
+		if (caller != null) {
+			logger.logp (Level.FINER, caller.getClassName (), caller.getMethodName () + "():" + caller.getLineNumber (), msg);
+		} else {
+			logger.logp (Level.FINER, "(UnknownSourceClass)", "(unknownSourceMethod)", msg);
+		}
 	}
 
 	/**
@@ -508,7 +536,11 @@ public class LoggerWrapper {
 	 */
 	public void finest (String msg) {
 		StackTraceElement caller = LogHelperUtil.getCallerStackTraceElement ();
-		logger.logp (Level.FINEST, caller.getClassName (), caller.getMethodName (), msg);
+		if (caller != null) {
+			logger.logp (Level.FINEST, caller.getClassName (), caller.getMethodName () + "():" + caller.getLineNumber (), msg);
+		} else {
+			logger.logp (Level.FINEST, "(UnknownSourceClass)", "(unknownSourceMethod)", msg);
+		}
 	}
 
 	/**
@@ -527,7 +559,11 @@ public class LoggerWrapper {
 			toLog += domNodeDescription (nodeList.item (i), 0) + "\n";
 		}
 
-		logger.logp (Level.FINER, caller.getClassName (), caller.getMethodName (), toLog);
+		if (caller != null) {
+			logger.logp (Level.FINER, caller.getClassName (), caller.getMethodName () + "():" + caller.getLineNumber (), toLog);
+		} else {
+			logger.logp (Level.FINER, "(UnknownSourceClass)", "(unknownSourceMethod)", toLog);
+		}
 	}
 
 	/**
@@ -543,7 +579,11 @@ public class LoggerWrapper {
 
 		String toLog =  (msg != null ? msg + "\n" : "DOM node:\n") + domNodeDescription (node, 0);
 
-		logger.logp (Level.FINER, caller.getClassName (), caller.getMethodName (), toLog);
+		if (caller != null) {
+			logger.logp (Level.FINER, caller.getClassName (), caller.getMethodName () + "():" + caller.getLineNumber (), toLog);
+		} else {
+			logger.logp (Level.FINER, "(UnknownSourceClass)", "(unknownSourceMethod)", toLog);
+		}
 	}
 
 	/**

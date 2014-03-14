@@ -36,7 +36,7 @@ public class LoggerFormatter extends Formatter {
 				.append (logRecord.getSourceClassName ())
 				.append (":")
 				.append (logRecord.getSourceMethodName ())
-				.append ("(): ")
+				.append (": ")
 				.append (logRecord.getMessage ());
 
 		Object[] params = logRecord.getParameters ();
