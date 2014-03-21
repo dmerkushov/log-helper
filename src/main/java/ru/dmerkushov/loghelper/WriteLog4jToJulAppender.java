@@ -10,11 +10,11 @@ import java.util.logging.Level;
  *
  * @author Dmitriy Merkushov
  */
-public class Log4jAppenderForLoggerWrapper extends org.apache.log4j.AppenderSkeleton {
+public class WriteLog4jToJulAppender extends org.apache.log4j.AppenderSkeleton {
 
 	LoggerWrapper loggerWrapper;
 
-	public Log4jAppenderForLoggerWrapper (LoggerWrapper loggerWrapper) {
+	public WriteLog4jToJulAppender (LoggerWrapper loggerWrapper) {
 		this.loggerWrapper = loggerWrapper;
 	}
 

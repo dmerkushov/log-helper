@@ -72,7 +72,7 @@ public class LoggerFormatter extends Formatter {
 			resultBuilder.append ("\nThrowing:\n")
 					.append (getFullThrowableMsg (t));
 		}
-
+		
 		String result = resultBuilder.toString ().replaceAll ("\n", "\n" + prefix) + "\n";
 
 		return result;

@@ -12,11 +12,15 @@ import java.util.logging.LogRecord;
  *
  * @author Dmitriy Merkushov
  */
-public class WriteToLog4jHandler extends Handler {
+public class WriteJulToLog4jHandler extends Handler {
 	
 	@Override
 	public synchronized void publish (LogRecord record) {
-		org.apache.log4j.Logger log4jLogger = org.apache.log4j.Logger.getLogger (record.getLoggerName ());
+		if (!isLoggable (record)) {
+			return;
+		}
+
+		org.apache.log4j.Logger log4jLogger = org.apache.log4j.Logger.getLogger (record.getLoggerName () + "_WriteToLog4jHandler");
 		
 		org.apache.log4j.Level log4jLevel = LoggerWrapper.getLog4jLevelFromJUL (record.getLevel ());
 		

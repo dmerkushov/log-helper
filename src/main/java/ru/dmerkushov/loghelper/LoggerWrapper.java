@@ -34,7 +34,7 @@ public class LoggerWrapper {
 
 	Logger logger;
 	org.apache.log4j.Logger log4jLogger;
-	Log4jAppenderForLoggerWrapper log4jAppender;
+	WriteLog4jToJulAppender log4jAppender;
 	static HashMap<String, LoggerWrapper> wrappers = new HashMap<String, LoggerWrapper> ();
 	Level defaultLevel = Level.ALL;
 
@@ -44,7 +44,7 @@ public class LoggerWrapper {
 
 		log4jLogger = org.apache.log4j.Logger.getLogger (name);
 		log4jLogger.removeAllAppenders ();
-		log4jAppender = new Log4jAppenderForLoggerWrapper (this);
+		log4jAppender = new WriteLog4jToJulAppender (this);
 		log4jLogger.addAppender (log4jAppender);
 		log4jLogger.setLevel (getLog4jLevelFromJUL (defaultLevel));
 	}
@@ -295,8 +295,8 @@ public class LoggerWrapper {
 	}
 	
 	public void addWriteToLog4jHandler () {
-		WriteToLog4jHandler log4jHandler = null;
-		log4jHandler = new WriteToLog4jHandler ();
+		WriteJulToLog4jHandler log4jHandler = null;
+		log4jHandler = new WriteJulToLog4jHandler ();
 		log4jHandler.setLevel (defaultLevel);
 		log4jHandler.setFormatter (new LoggerFormatter ());
 		logger.addHandler (log4jHandler);

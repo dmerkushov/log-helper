@@ -75,6 +75,10 @@ public class DailyRollingFileHandler extends StreamHandler {
 
 	@Override
 	public synchronized void publish (LogRecord record) {
+		if (!isLoggable (record)) {
+			return;
+		}
+
 		String filename = generateFilename (new java.util.Date (record.getMillis ()));
 
 		if (!previousFilename.equals (filename)) {
