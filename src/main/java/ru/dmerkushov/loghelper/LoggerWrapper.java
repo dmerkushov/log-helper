@@ -150,6 +150,14 @@ public class LoggerWrapper {
 	}
 
 	/**
+	 * Removes all handlers, then adds a write-to-log4j handler
+	 */
+	public void configureByDefaultWriteToLog4j () {
+		removeLoggerHandlers ();
+		addWriteToLog4jHandler ();
+	}
+
+	/**
 	 * Remove all handlers from the linked logger
 	 */
 	public void removeLoggerHandlers () {
@@ -284,6 +292,14 @@ public class LoggerWrapper {
 		ch.setLevel (defaultLevel);
 		ch.setFormatter (new LoggerFormatter ());
 		logger.addHandler (ch);
+	}
+	
+	public void addWriteToLog4jHandler () {
+		WriteToLog4jHandler log4jHandler = null;
+		log4jHandler = new WriteToLog4jHandler ();
+		log4jHandler.setLevel (defaultLevel);
+		log4jHandler.setFormatter (new LoggerFormatter ());
+		logger.addHandler (log4jHandler);
 	}
 
 	/**
