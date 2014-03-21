@@ -47,7 +47,7 @@ public class SizeRollingFileHandler extends Handler {
 	 * @param pattern The pattern of the file name, containing <code>%d</code>
 	 * to indicate the place of the date in the file name, and <code>%u</code>
 	 * to indicate the place of a unique numeric identifier. The date will be
-	 * formatted as <code>yyyy-MM-dd</code> 	 * for <code>SimpleDateFormat</code>.<br/> If no <code>%d</code> is
+	 * formatted as <code>yyyy-MM-dd</code> 	 * for <code>SimpleDateFormat</code>.<br> If no <code>%d</code> is
 	 * found, the date is added at the end of the filename. The same *
 	 * about <code>%u</code>.
 	 * @param maxLogSize Maximum log file size in bytes. If it is less than

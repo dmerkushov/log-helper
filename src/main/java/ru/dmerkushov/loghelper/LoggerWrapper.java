@@ -20,10 +20,10 @@ import org.w3c.dom.NodeList;
 
 /**
  * Class that slightly extends the functionality of
- * <code>java.util.logging.Logger</code><br/>
+ * <code>java.util.logging.Logger</code><br>
  *
- * Usage:<br/>
- * <code>LoggerWrapper loggerWrapper = LoggerWrapper.getLoggerWrapper ("Logger wrapper name");<br/>
+ * Usage:<br>
+ * <code>LoggerWrapper loggerWrapper = LoggerWrapper.getLoggerWrapper ("Logger wrapper name");<br>
  * Logger logger = loggerWrapper.getLogger ();
  * </code>
  *
