@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package ru.dmerkushov.loghelper;
+package ru.dmerkushov.loghelper.handler;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -13,6 +13,7 @@ import java.util.logging.ErrorManager;
 import java.util.logging.Formatter;
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
+import ru.dmerkushov.loghelper.formatter.LoggerFormatter;
 
 /**
  *
@@ -92,6 +93,8 @@ public class SizeRollingFileHandler extends Handler {
 	 * containing <code>%u</code> to indicate the place of a unique numeric
 	 * identifier. If no <code>%u</code> is found, it is added at the end of the
 	 * pattern.
+	 * @throws IllegalArgumentException
+	 * @throws IOException
 	 * @see SizeRollingFileHandler#DEFAULT_LOG_SIZE_BOUND
 	 */
 	public SizeRollingFileHandler (String pattern) throws IllegalArgumentException, IOException {
@@ -103,6 +106,8 @@ public class SizeRollingFileHandler extends Handler {
 	 *
 	 * @param maxLogSize Maximum log file size in bytes. If it is less than
 	 * MINIMUM_LOG_SIZE_BOUND, it is set to MINIMUM_LOG_SIZE_BOUND
+	 * @throws IllegalArgumentException
+	 * @throws IOException
 	 * @see SizeRollingFileHandler#MINIMUM_LOG_SIZE_BOUND
 	 */
 	public SizeRollingFileHandler (long maxLogSize) throws IllegalArgumentException, IOException {

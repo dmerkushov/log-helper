@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package ru.dmerkushov.loghelper;
+package ru.dmerkushov.loghelper.formatter;
 
 import java.text.SimpleDateFormat;
 import java.util.logging.Formatter;

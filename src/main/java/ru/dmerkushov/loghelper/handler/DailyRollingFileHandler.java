@@ -2,8 +2,9 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package ru.dmerkushov.loghelper;
+package ru.dmerkushov.loghelper.handler;
 
+import ru.dmerkushov.loghelper.*;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -94,7 +95,6 @@ public class DailyRollingFileHandler extends StreamHandler {
 			}
 			previousFilename = filename;
 			super.setOutputStream (fos);
-//			firstLogRecord ();			// WARNING: firstLogRecord () runs publish() recursively! Use with care
 		}
 
 		super.publish (record);

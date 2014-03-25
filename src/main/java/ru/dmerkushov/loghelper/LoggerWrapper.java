@@ -17,6 +17,11 @@ import java.util.logging.Logger;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import ru.dmerkushov.loghelper.formatter.LoggerFormatter;
+import ru.dmerkushov.loghelper.handler.DailyRollingFileHandler;
+import ru.dmerkushov.loghelper.handler.SizeRollingFileHandler;
+import ru.dmerkushov.loghelper.log4j.connect.WriteJulToLog4jHandler;
+import ru.dmerkushov.loghelper.log4j.connect.WriteLog4jToJulAppender;
 
 /**
  * Class that slightly extends the functionality of
@@ -65,6 +70,24 @@ public class LoggerWrapper {
 		}
 
 		return result;
+	}
+
+	/**
+	 * Get the current JUL logging level
+	 *
+	 * @return
+	 */
+	public Level getJulLevel () {
+		return getLogger ().getLevel ();
+	}
+
+	/**
+	 * Set the JUL level
+	 *
+	 * @param level
+	 */
+	public synchronized void setJulLevel (Level level) {
+			logger.setLevel (level);
 	}
 
 	/**
@@ -293,7 +316,7 @@ public class LoggerWrapper {
 		ch.setFormatter (new LoggerFormatter ());
 		logger.addHandler (ch);
 	}
-	
+
 	public void addWriteToLog4jHandler () {
 		WriteJulToLog4jHandler log4jHandler = null;
 		log4jHandler = new WriteJulToLog4jHandler ();
@@ -303,25 +326,27 @@ public class LoggerWrapper {
 	}
 
 	/**
-	 * Log a method entry. <p> This is a convenience method that can be used to
+	 * Log a method entry.
+	 * <p>
+	 * This is a convenience method that can be used to
 	 * log entry to a method. A LogRecord with message "ENTRY", log level FINER,
-	 * and the given sourceMethod and sourceClass is logged. <p>
+	 * and the given sourceMethod and sourceClass is logged.
+	 * <p>
 	 */
 	public void entering () {
 		StackTraceElement caller = LogHelperUtil.getCallerStackTraceElement ();
 		logger.entering (caller.getClassName (), caller.getMethodName ());
 	}
 
-	/*public void entering (Object[] methodParams) {
-	 StackTraceElement caller = LogHelperUtil.getCallerStackTraceElement ();
-	 logger.entering (caller.getClassName (), caller.getMethodName (), methodParams);
-	 }*/
 	/**
-	 * Log a method entry, with an array of parameters. <p> This is a
+	 * Log a method entry, with an array of parameters.
+	 * <p>
+	 * This is a
 	 * convenience method that can be used to log entry to a method. A LogRecord
 	 * with message "ENTRY" (followed by a format {N} indicator for each entry
 	 * in the parameter array), log level FINER, and the given sourceMethod,
-	 * sourceClass, and parameters is logged. <p>
+	 * sourceClass, and parameters is logged.
+	 * <p>
 	 *
 	 * @param methodParams array of parameters to the method being entered
 	 */
@@ -331,9 +356,12 @@ public class LoggerWrapper {
 	}
 
 	/**
-	 * Log a method return. <p> This is a convenience method that can be used to
+	 * Log a method return.
+	 * <p>
+	 * This is a convenience method that can be used to
 	 * log returning from a method. A LogRecord with message "RETURN", log level
-	 * FINER, and the given sourceMethod and sourceClass is logged. <p>
+	 * FINER, and the given sourceMethod and sourceClass is logged.
+	 * <p>
 	 */
 	public void exiting () {
 		StackTraceElement caller = LogHelperUtil.getCallerStackTraceElement ();
@@ -341,10 +369,13 @@ public class LoggerWrapper {
 	}
 
 	/**
-	 * Log a method return, with result object. <p> This is a convenience method
+	 * Log a method return, with result object.
+	 * <p>
+	 * This is a convenience method
 	 * that can be used to log returning from a method. A LogRecord with message
 	 * "RETURN {0}", log level FINER, and the gives sourceMethod, sourceClass,
-	 * and result object is logged. <p>
+	 * and result object is logged.
+	 * <p>
 	 *
 	 * @param result Object that is being returned
 	 */
@@ -391,15 +422,20 @@ public class LoggerWrapper {
 
 	/**
 	 * Log a Throwable at Level.FINER, with associated Throwable information.
-	 * <p> This is a convenience method to log that a method is terminating by
-	 * throwing an exception. The logging is done using the FINER level. <p> If
+	 * <p>
+	 * This is a convenience method to log that a method is terminating by
+	 * throwing an exception. The logging is done using the FINER level.
+	 * <p>
+	 * If
 	 * the logger is currently enabled for the given message level then the
 	 * given arguments are stored in a LogRecord which is forwarded to all
 	 * registered output handlers. The LogRecord's message is set to "THROW".
-	 * <p> Note that the thrown argument is stored in the LogRecord thrown
+	 * <p>
+	 * Note that the thrown argument is stored in the LogRecord thrown
 	 * property, rather than the LogRecord parameters property. Thus is it
 	 * processed specially by output Formatters and is not treated as a
-	 * formatting parameter to the LogRecord message property. <p>
+	 * formatting parameter to the LogRecord message property.
+	 * <p>
 	 *
 	 * @param t The Throwable that is being thrown.
 	 * @see Logger#throwing(java.lang.String, java.lang.String,
@@ -412,17 +448,21 @@ public class LoggerWrapper {
 		} else {
 			logger.throwing ("(UnknownSourceClass)", "(unknownSourceMethod)", t);
 		}
-		
+
 	}
 
 	/**
-	 * Log a message at Level.FINER, with associated Throwable information. <p>
+	 * Log a message at Level.FINER, with associated Throwable information.
+	 * <p>
 	 * If the logger is currently enabled for Level.FINER then the given
 	 * arguments are stored in a LogRecord which is forwarded to all registered
-	 * output handlers. <p> Note that the thrown argument is stored in the
+	 * output handlers.
+	 * <p>
+	 * Note that the thrown argument is stored in the
 	 * LogRecord thrown property, rather than the LogRecord parameters property.
 	 * Thus is it processed specially by output Formatters and is not treated as
-	 * a formatting parameter to the LogRecord message property. <p>
+	 * a formatting parameter to the LogRecord message property.
+	 * <p>
 	 *
 	 * @param msg The string message (or a key in the message catalog)
 	 * @param t Throwable associated with log message.
@@ -442,9 +482,12 @@ public class LoggerWrapper {
 
 	/**
 	 * Log a SEVERE message, specifying source class and method, with no
-	 * arguments. <p> If the logger is currently enabled for the given message
+	 * arguments.
+	 * <p>
+	 * If the logger is currently enabled for the given message
 	 * level then the given message is forwarded to all the registered output
-	 * Handler objects. <p>
+	 * Handler objects.
+	 * <p>
 	 *
 	 * @param msg The string message (or a key in the message catalog)
 	 */
@@ -459,9 +502,12 @@ public class LoggerWrapper {
 
 	/**
 	 * Log a WARNING message, specifying source class and method, with no
-	 * arguments. <p> If the logger is currently enabled for the given message
+	 * arguments.
+	 * <p>
+	 * If the logger is currently enabled for the given message
 	 * level then the given message is forwarded to all the registered output
-	 * Handler objects. <p>
+	 * Handler objects.
+	 * <p>
 	 *
 	 * @param msg The string message (or a key in the message catalog)
 	 */
@@ -476,9 +522,12 @@ public class LoggerWrapper {
 
 	/**
 	 * Log an INFO message, specifying source class and method, with no
-	 * arguments. <p> If the logger is currently enabled for the given message
+	 * arguments.
+	 * <p>
+	 * If the logger is currently enabled for the given message
 	 * level then the given message is forwarded to all the registered output
-	 * Handler objects. <p>
+	 * Handler objects.
+	 * <p>
 	 *
 	 * @param msg The string message (or a key in the message catalog)
 	 */
@@ -493,9 +542,12 @@ public class LoggerWrapper {
 
 	/**
 	 * Log a CONFIG message, specifying source class and method, with no
-	 * arguments. <p> If the logger is currently enabled for the given message
+	 * arguments.
+	 * <p>
+	 * If the logger is currently enabled for the given message
 	 * level then the given message is forwarded to all the registered output
-	 * Handler objects. <p>
+	 * Handler objects.
+	 * <p>
 	 *
 	 * @param msg The string message (or a key in the message catalog)
 	 */
@@ -510,9 +562,12 @@ public class LoggerWrapper {
 
 	/**
 	 * Log a FINE message, specifying source class and method, with no
-	 * arguments. <p> If the logger is currently enabled for the given message
+	 * arguments.
+	 * <p>
+	 * If the logger is currently enabled for the given message
 	 * level then the given message is forwarded to all the registered output
-	 * Handler objects. <p>
+	 * Handler objects.
+	 * <p>
 	 *
 	 * @param msg The string message (or a key in the message catalog)
 	 */
@@ -527,9 +582,12 @@ public class LoggerWrapper {
 
 	/**
 	 * Log a FINER message, specifying source class and method, with no
-	 * arguments. <p> If the logger is currently enabled for the given message
+	 * arguments.
+	 * <p>
+	 * If the logger is currently enabled for the given message
 	 * level then the given message is forwarded to all the registered output
-	 * Handler objects. <p>
+	 * Handler objects.
+	 * <p>
 	 *
 	 * @param msg The string message (or a key in the message catalog)
 	 */
@@ -544,9 +602,12 @@ public class LoggerWrapper {
 
 	/**
 	 * Log a FINEST message, specifying source class and method, with no
-	 * arguments. <p> If the logger is currently enabled for the given message
+	 * arguments.
+	 * <p>
+	 * If the logger is currently enabled for the given message
 	 * level then the given message is forwarded to all the registered output
-	 * Handler objects. <p>
+	 * Handler objects.
+	 * <p>
 	 *
 	 * @param msg The string message (or a key in the message catalog)
 	 */
@@ -593,7 +654,7 @@ public class LoggerWrapper {
 	public void logDomNode (String msg, Node node) {
 		StackTraceElement caller = LogHelperUtil.getCallerStackTraceElement ();
 
-		String toLog =  (msg != null ? msg + "\n" : "DOM node:\n") + domNodeDescription (node, 0);
+		String toLog = (msg != null ? msg + "\n" : "DOM node:\n") + domNodeDescription (node, 0);
 
 		if (caller != null) {
 			logger.logp (Level.FINER, caller.getClassName (), caller.getMethodName () + "():" + caller.getLineNumber (), toLog);
@@ -604,9 +665,10 @@ public class LoggerWrapper {
 
 	/**
 	 * Form a DOM node textual representation recursively
+	 *
 	 * @param node
 	 * @param tablevel
-	 * @return 
+	 * @return
 	 */
 	private String domNodeDescription (Node node, int tablevel) {
 		String domNodeDescription = null;
@@ -660,27 +722,29 @@ public class LoggerWrapper {
 	public boolean isLoggable (Level level) {
 		return logger.isLoggable (level);
 	}
-	
+
 	/**
 	 * Set this level for all configured loggers
-	 * @param level 
+	 *
+	 * @param level
 	 */
 	public void setLevel (Level level) {
-		
+
 		this.defaultLevel = level;
 		logger.setLevel (level);
-		for (Handler handler: logger.getHandlers ()) {
+		for (Handler handler : logger.getHandlers ()) {
 			handler.setLevel (level);
 		}
-		
+
 		log4jLogger.setLevel (getLog4jLevelFromJUL (level));
-		
+
 	}
-	
+
 	/**
 	 * Get a Log4j logging level the same as given JUL level
+	 *
 	 * @param level
-	 * @return 
+	 * @return
 	 */
 	public static org.apache.log4j.Level getLog4jLevelFromJUL (java.util.logging.Level level) {
 		org.apache.log4j.Level log4jLevel;
@@ -701,7 +765,13 @@ public class LoggerWrapper {
 		}
 		return log4jLevel;
 	}
-	
+
+	/**
+	 * Get a JUL logging level the same as given Log4j level
+	 *
+	 * @param log4jLevel
+	 * @return
+	 */
 	public static Level getJULLevelFromLog4j (org.apache.log4j.Level log4jLevel) {
 		int log4jLevelInt = log4jLevel.toInt ();
 		Level julLevel;

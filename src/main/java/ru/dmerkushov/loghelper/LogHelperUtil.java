@@ -10,17 +10,21 @@ package ru.dmerkushov.loghelper;
  */
 public class LogHelperUtil {
 
+	/**
+	 * Get the StackTraceElement of the method that called the caller of getCallerStackTraceElement ()
+	 * @return may be null
+	 */
 	public static StackTraceElement getCallerStackTraceElement () {
-		StackTraceElement toReturn = null;
+		StackTraceElement callerStackTraceElement = null;
 
 		StackTraceElement[] stackTraceElements = Thread.currentThread ().getStackTrace ();
 		if (stackTraceElements != null) {
 			if (stackTraceElements.length > 3) {
-				toReturn = stackTraceElements[3];
+				callerStackTraceElement = stackTraceElements[3];
 			}
 		}
 
-		return toReturn;
+		return callerStackTraceElement;
 	}
 
 }

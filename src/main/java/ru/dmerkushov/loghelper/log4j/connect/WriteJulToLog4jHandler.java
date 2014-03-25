@@ -2,8 +2,9 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package ru.dmerkushov.loghelper;
+package ru.dmerkushov.loghelper.log4j.connect;
 
+import ru.dmerkushov.loghelper.*;
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
 
@@ -20,7 +21,7 @@ public class WriteJulToLog4jHandler extends Handler {
 			return;
 		}
 
-		org.apache.log4j.Logger log4jLogger = org.apache.log4j.Logger.getLogger (record.getLoggerName () + "_WriteToLog4jHandler");
+		org.apache.log4j.Logger log4jLogger = org.apache.log4j.Logger.getLogger (record.getLoggerName () + "_" + toStringAsObject ());
 		
 		org.apache.log4j.Level log4jLevel = LoggerWrapper.getLog4jLevelFromJUL (record.getLevel ());
 		
@@ -41,5 +42,14 @@ public class WriteJulToLog4jHandler extends Handler {
 
 	@Override
 	public void close () throws SecurityException {
+	}
+	
+	/**
+	 * Returning the same result as {@link java.lang.Object}'s toString() method,
+	 * because there may be ancestors of WriteJulToLog4jHandler
+	 * @return the same as {@link java.lang.Object}'s toString() method
+	 */
+	public String toStringAsObject () {
+		return getClass().getName() + "@" + Integer.toHexString(hashCode());
 	}
 }
