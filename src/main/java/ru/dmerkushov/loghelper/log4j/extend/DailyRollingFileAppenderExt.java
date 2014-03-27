@@ -20,7 +20,7 @@
  */
 
 /*
- * Based on Apache Software Foundation's DailyRollingFileAppender
+ * Based on Apache Software Foundation's DailyRollingFileAppender from Log4j 1.2.17
  * 
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements. See the NOTICE file distributed with
@@ -56,31 +56,60 @@ import org.apache.log4j.helpers.LogLog;
 import org.apache.log4j.spi.LoggingEvent;
 
 /**
- *
- * @author Dmitriy Merkushov,
+ * Unfortunately, this class cannot extend {@link org.apache.log4j.DailyRollingFileAppender} itself due to member visibility issues. Still, it has the same API, with some additions.
+ * 
+ * @author Dmitriy Merkushov
+ * @see ru.dmerkushov.loghelper.log4j.extend.DailyRollingFileAppenderExt#getKeepOldLogsSeconds() 
+ * @see ru.dmerkushov.loghelper.log4j.extend.DailyRollingFileAppenderExt#setKeepOldLogsSeconds(long) 
  */
 public class DailyRollingFileAppenderExt extends FileAppender {
-	
-	public static boolean debugFlag = true;
+
+//	============================================================================
+//	============================================================================
+//	The source that was (re)written
+//	============================================================================
+//	============================================================================
 
 	/**
-	 * Keep the old logs for the given number of seconds, and after that delete
+	 * Default value for the number of seconds, after which the old log files will be deleted. Value: 604800 = 7*24*60*60 seconds = 7 days
 	 */
-	private String keepOldLogsSeconds = "604800";
+	public final static long KEEPOLDLOGSSECONDS_DEFAULT = 604800;
 
-	public String getKeepOldLogsSeconds () {
+	/**
+	 * Keep the old logs for the given number of seconds, and after that delete. Default is 604800, which is 7*24*60*60 seconds = 7 days. If keepOldLogsSeconds &lt;= 0 , will keep all the old logs.
+	 */
+	private long keepOldLogsSeconds = KEEPOLDLOGSSECONDS_DEFAULT;
+	
+	/**
+	 * Get the number of seconds, after which the old log files will be deleted. "0" means "Keep old logs forever". Values less than 0 are not likely.
+	 * @return 
+	 */
+	public long getKeepOldLogsSeconds () {
 		return keepOldLogsSeconds;
 	}
 
-	public void setKeepOldLogsSeconds (String secondsToKeepOldLogs) {
-		this.keepOldLogsSeconds = secondsToKeepOldLogs;
+	/**
+	 * Set the number of seconds, after which the old log files will be deleted. "0" means "Keep old logs forever". Values less than 0 are set to 0.
+	 * Non-parseable String values are set to default (see {@link DailyRollingFileAppenderExt#KEEPOLDLOGSSECONDS_DEFAULT}).
+	 * @param secondsToKeepOldLogs 
+	 */
+	public void setKeepOldLogsSeconds (long secondsToKeepOldLogs) {
+		long keepOldLogsSeconds;
+		try {
+			keepOldLogsSeconds = secondsToKeepOldLogs;
+			if (keepOldLogsSeconds < 0L) {
+				keepOldLogsSeconds = 0L;
+			}
+		} catch (NumberFormatException ex) {
+			keepOldLogsSeconds = KEEPOLDLOGSSECONDS_DEFAULT;
+		}
+		this.keepOldLogsSeconds = keepOldLogsSeconds;
 	}
 
 	/**
 	 * The default constructor does nothing.
 	 */
 	public DailyRollingFileAppenderExt () {
-		super ();
 	}
 
 	/**
@@ -158,15 +187,14 @@ public class DailyRollingFileAppenderExt extends FileAppender {
 
 		File[] logFiles = logParentDir.listFiles (logFileFilter);
 
-		long keepOldLogsSecondsL = Long.valueOf (this.keepOldLogsSeconds);
 		long cleanupTimeRazor = 0L;			// By default, keep all logs
-		if (keepOldLogsSecondsL > 0L) {
-			cleanupTimeRazor = new Date ().getTime () - 1000L * keepOldLogsSecondsL;
+		if (keepOldLogsSeconds > 0L) {
+			cleanupTimeRazor = new Date ().getTime () - 1000L * keepOldLogsSeconds;
 		}
-		
-		LogLog.debug ("Cleanup time razor: " + cleanupTimeRazor);
+
+		LogLog.debug ("Log files with modified time before: " + cleanupTimeRazor + " (millis since epoch) are to be deleted");
 		LogLog.debug ("Log files:");
-		for (File logFile: logFiles) {
+		for (File logFile : logFiles) {
 			LogLog.debug (logFile.getName () + " - modified " + logFile.lastModified ());
 		}
 
@@ -189,7 +217,7 @@ public class DailyRollingFileAppenderExt extends FileAppender {
 
 		String checkAgainstFilename;
 		SimpleDateFormat sdf;
-		
+
 		/**
 		 * Create a LogFileFilter instance for the current {@link DailyRollingFileAppenderExt} instance
 		 */
@@ -199,14 +227,16 @@ public class DailyRollingFileAppenderExt extends FileAppender {
 
 		/**
 		 * Create a LogFileFilter instance for a given {@link DailyRollingFileAppenderExt} instance
+		 *
 		 * @param drfae
 		 */
 		public LogFileFilter (DailyRollingFileAppenderExt drfae) {
 			this (new File (drfae.getFile ()), drfae.getDatePattern ());
 		}
-		
+
 		/**
 		 * Create a LogFileFilter instance for a given filename and date pattern to check against
+		 *
 		 * @param checkAgainst Base name of the log file
 		 * @param datePattern Date pattern
 		 */
@@ -242,10 +272,9 @@ public class DailyRollingFileAppenderExt extends FileAppender {
 
 //	============================================================================
 //	============================================================================
-//	APACHE DailyRollingFileAppender source (with minimum changes) follows
+//	The original DailyRollingFileAppender source, with minimum changes
 //	============================================================================
 //	============================================================================
-
 	// The code assumes that the following constants are in a increasing sequence.
 	static final int TOP_OF_TROUBLE = -1;
 	static final int TOP_OF_MINUTE = 0;
