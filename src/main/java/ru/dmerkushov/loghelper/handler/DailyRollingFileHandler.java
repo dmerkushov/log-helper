@@ -4,7 +4,6 @@
  */
 package ru.dmerkushov.loghelper.handler;
 
-import ru.dmerkushov.loghelper.*;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -27,6 +26,56 @@ public class DailyRollingFileHandler extends StreamHandler {
 	private static SimpleDateFormat timeFormat = new SimpleDateFormat ("HH:mm:ss.S Z");
 	private long unique = 0;
 	private FileOutputStream fos;
+	private File file;
+
+	/**
+	 * Get the filename pattern of the log file, as it was supplied to the {@link ru.dmerkushov.loghelper.handler.DailyRollingFileHandler#DailyRollingFileHandler(java.lang.String) constructor}
+	 * @return 
+	 */
+	public String getPattern () {
+		return pattern;
+	}
+
+	/**
+	 * Get the date format used by the handler
+	 * @return 
+	 */
+	public static SimpleDateFormat getDateFormat () {
+		return dateFormat;
+	}
+
+	/**
+	 * Get the time format used by the handler
+	 * @return 
+	 */
+	public static SimpleDateFormat getTimeFormat () {
+		return timeFormat;
+	}
+
+	/**
+	 * Get the current unique log number
+	 * @return 
+	 */
+	public long getUnique () {
+		return unique;
+	}
+
+	/**
+	 * Get the {@link java.io.FileOutputStream} instance for this handler where the last record has been logged (or, if none has been logged by this handler, where the first must be)
+	 * @return 
+	 */
+	public FileOutputStream getFos () {
+		return fos;
+	}
+
+	/**
+	 * Get the {@link java.io.File} instance for this handler where the last record has been logged (or, if none has been logged by this handler, where the first must be)
+	 * @return 
+	 */
+	public File getFile () {
+		return file;
+	}
+
 
 	/**
 	 * Create a daily rolling file handler with the pattern "log_%d_%u".
@@ -69,7 +118,8 @@ public class DailyRollingFileHandler extends StreamHandler {
 
 		this.pattern = pattern;
 		this.previousFilename = generateFilename (new java.util.Date ());
-		fos = new FileOutputStream (previousFilename, true);
+		file = new File (previousFilename);
+		fos = new FileOutputStream (file, true);
 		super.setOutputStream (fos);
 //		firstLogRecord ();
 	}
@@ -82,9 +132,11 @@ public class DailyRollingFileHandler extends StreamHandler {
 
 		String filename = generateFilename (new java.util.Date (record.getMillis ()));
 
+		// Change the log file
 		if (!previousFilename.equals (filename)) {
+			file = new File (filename);
 			try {
-				fos = new FileOutputStream (filename, true);
+				fos = new FileOutputStream (file, true);
 			} catch (IOException ex) {
 				super.reportError (null, ex, ErrorManager.GENERIC_FAILURE);
 			}
