@@ -9,19 +9,13 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Properties;
-import java.util.logging.ConsoleHandler;
-import java.util.logging.FileHandler;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import ru.dmerkushov.loghelper.formatter.LoggerFormatter;
-import ru.dmerkushov.loghelper.handler.DailyRollingFileHandler;
-import ru.dmerkushov.loghelper.handler.SizeRollingFileHandler;
-import ru.dmerkushov.loghelper.log4j.connect.WriteJulToLog4jHandler;
-import ru.dmerkushov.loghelper.log4j.connect.WriteLog4jToJulAppender;
+import ru.dmerkushov.loghelper.configure.LogHelperConfigurator;
 
 /**
  * Class that slightly extends the functionality of
@@ -38,38 +32,20 @@ import ru.dmerkushov.loghelper.log4j.connect.WriteLog4jToJulAppender;
 public class LoggerWrapper {
 
 	Logger logger;
-	org.apache.log4j.Logger log4jLogger;
-	WriteLog4jToJulAppender log4jAppender;
-	static HashMap<String, LoggerWrapper> wrappers = new HashMap<String, LoggerWrapper> ();
-	Level defaultLevel = Level.ALL;
-
-	private LoggerWrapper (String name) {
-		logger = Logger.getLogger (name);
-		logger.setLevel (defaultLevel);
-
-		log4jLogger = org.apache.log4j.Logger.getLogger (name);
-		log4jLogger.removeAllAppenders ();
-		log4jAppender = new WriteLog4jToJulAppender (this);
-		log4jLogger.addAppender (log4jAppender);
-		log4jLogger.setLevel (getLog4jLevelFromJUL (defaultLevel));
+	protected Level defaultLevel = Level.ALL;
+	String name;
+	
+	static {
+		LogHelperConfigurator.configure ();
 	}
 
-	/**
-	 * Get a loggerWrapper instance with a console handler
-	 *
-	 * @param name
-	 * @return
-	 */
-	public static synchronized LoggerWrapper getLoggerWrapper (String name) {
-		LoggerWrapper result;
-		if (wrappers.containsKey (name)) {
-			result = wrappers.get (name);
-		} else {
-			result = new LoggerWrapper (name);
-			wrappers.put (name, result);
-		}
-
-		return result;
+	protected LoggerWrapper (String name) {
+		logger = Logger.getLogger (name);
+		logger.setLevel (defaultLevel);
+		
+		this.name = name;
+		
+		LogHelper.registerLoggerWrapper (this);
 	}
 
 	/**
@@ -98,233 +74,44 @@ public class LoggerWrapper {
 	public Logger getLogger () {
 		return logger;
 	}
-
+	
 	/**
-	 * Get the Log4j Logger instance linked to this LoggerWrapper. Any log
-	 * record sent to this logger will be logged by the LoggerWrapper instance.
-	 *
-	 * @return
+	 * Get this instance's name
+	 * @return 
 	 */
-	public org.apache.log4j.Logger getLog4jLogger () {
-		return log4jLogger;
+	public String getName () {
+		return name;
+	}
+	
+	public void addLoggerHandler (Handler handler) {
+		logger.addHandler (handler);
 	}
 
 	/**
-	 * Removes all handlers, then adds a console handler and a file handler with
-	 * the specified filename pattern
-	 *
-	 * @param filenamePattern the filename pattern as in FileHandler
-	 * constructor; if <code>null</code>, the FileHandler won't be added
-	 * @return true if file handler has been added; console handler adding
-	 * should be ever successful
-	 * @see FileHandler
-	 * @see FileHandler#FileHandler(java.lang.String)
+	 * Remove a handler from the linked logger
+	 * @param handler 
 	 */
-	public boolean configureByDefault (String filenamePattern) {
-		removeLoggerHandlers ();
-		addConsoleHandler ();
-		boolean fileHandlerSuccess = false;
-		if (filenamePattern != null) {
-			fileHandlerSuccess = addFileHandler (filenamePattern);
-		}
-		return fileHandlerSuccess;
+	public void removeLoggerHandler (Handler handler) {
+		logger.removeHandler (handler);
 	}
-
+	
 	/**
-	 * Removes all handlers, then adds a console handler and a daily rolling
-	 * file handler with the specified filename pattern
-	 *
-	 * @param filenamePattern the filename pattern as in FileHandler
-	 * constructor; if <code>null</code>, the FileHandler won't be added
-	 * @return true if file handler has been added; console handler adding
-	 * should be ever successful
-	 * @see DailyRollingFileHandler
-	 * @see DailyRollingFileHandler#DailyRollingFileHandler(java.lang.String)
+	 * Get an array of handlers from the linked logger
+	 * @return 
 	 */
-	public boolean configureByDefaultDailyRolling (String filenamePattern) {
-		removeLoggerHandlers ();
-		addConsoleHandler ();
-		boolean fileHandlerSuccess = false;
-		if (filenamePattern != null) {
-			fileHandlerSuccess = addDailyRollingFileHandler (filenamePattern);
-		}
-		return fileHandlerSuccess;
-	}
-
-	/**
-	 * Removes all handlers, then adds a console handler and a size rolling
-	 * file handler with the specified filename pattern
-	 *
-	 * @param filenamePattern the filename pattern as in FileHandler
-	 * constructor; if <code>null</code>, the FileHandler won't be added
-	 * @return true if file handler has been added; console handler adding
-	 * should be ever successful
-	 * @see SizeRollingFileHandler
-	 * @see SizeRollingFileHandler#SizeRollingFileHandler(java.lang.String)
-	 */
-	public boolean configureByDefaultSizeRolling (String filenamePattern) {
-		removeLoggerHandlers ();
-		addConsoleHandler ();
-		boolean fileHandlerSuccess = false;
-		if (filenamePattern != null) {
-			fileHandlerSuccess = addSizeRollingFileHandler (filenamePattern);
-		}
-		return fileHandlerSuccess;
-	}
-
-	/**
-	 * Removes all handlers, then adds a write-to-log4j handler
-	 */
-	public void configureByDefaultWriteToLog4j () {
-		removeLoggerHandlers ();
-		addWriteToLog4jHandler ();
+	public Handler[] getLoggerHandlers () {
+		return logger.getHandlers ();
 	}
 
 	/**
 	 * Remove all handlers from the linked logger
 	 */
-	public void removeLoggerHandlers () {
-		for (Handler handler : logger.getHandlers ()) {
-			logger.removeHandler (handler);
+	public void removeAllLoggerHandlers () {
+		for (Handler handler : getLoggerHandlers ()) {
+			removeLoggerHandler (handler);
 		}
 	}
-
-	/**
-	 * Add a daily rolling file handler to the linked logger with ALL logging
-	 * level
-	 *
-	 * @param filenamePattern the filename pattern as in DailyRollingFileHandler
-	 * constructor
-	 * @return <code>true</code> if success, <code>false</code> otherwise
-	 * (including the case <code>filenamePattern</code> is <code>null</code>)
-	 * @see DailyRollingFileHandler
-	 * @see DailyRollingFileHandler#DailyRollingFileHandler(java.lang.String)
-	 * @see Level#ALL
-	 */
-	public boolean addDailyRollingFileHandler (String filenamePattern) {
-		boolean isSuccess = false;
-
-		if (filenamePattern != null) {
-			DailyRollingFileHandler drfh = null;
-			try {
-				drfh = new DailyRollingFileHandler (filenamePattern);
-			} catch (IOException ex) {
-				Logger.getLogger (LoggerWrapper.class.getName ()).log (Level.SEVERE, null, ex);
-			} catch (SecurityException ex) {
-				Logger.getLogger (LoggerWrapper.class.getName ()).log (Level.SEVERE, null, ex);
-			}
-
-			if (drfh != null) {
-				drfh.setLevel (Level.ALL);
-				drfh.setFormatter (new LoggerFormatter ());
-				logger.addHandler (drfh);
-				isSuccess = true;
-			} else {
-				isSuccess = false;
-			}
-		}
-
-		return isSuccess;
-	}
-
-	/**
-	 * Add a size rolling file handler to the linked logger with ALL logging
-	 * level
-	 *
-	 * @param filenamePattern the filename pattern as in SizeRollingFileHandler
-	 * constructor
-	 * @return <code>true</code> if success, <code>false</code> otherwise
-	 * (including the case <code>filenamePattern</code> is <code>null</code>)
-	 * @see SizeRollingFileHandler
-	 * @see SizeRollingFileHandler#SizeRollingFileHandler(java.lang.String)
-	 * @see Level#ALL
-	 */
-	public boolean addSizeRollingFileHandler (String filenamePattern) {
-		boolean isSuccess = false;
-
-		if (filenamePattern != null) {
-			SizeRollingFileHandler srfh = null;
-			try {
-				srfh = new SizeRollingFileHandler (filenamePattern);
-			} catch (IOException ex) {
-				Logger.getLogger (LoggerWrapper.class.getName ()).log (Level.SEVERE, null, ex);
-			} catch (SecurityException ex) {
-				Logger.getLogger (LoggerWrapper.class.getName ()).log (Level.SEVERE, null, ex);
-			}
-
-			if (srfh != null) {
-				srfh.setLevel (Level.ALL);
-				srfh.setFormatter (new LoggerFormatter ());
-				logger.addHandler (srfh);
-				isSuccess = true;
-			} else {
-				isSuccess = false;
-			}
-		}
-
-		return isSuccess;
-	}
-
-	/**
-	 * Add a default JUL file handler to the linked logger with ALL logging
-	 * level
-	 *
-	 * @param filenamePattern the filename pattern as in FileHandler constructor
-	 * @return <code>true</code> if success, <code>false</code> otherwise
-	 * (including the case <code>filenamePattern</code> is <code>null</code>)
-	 * @see FileHandler
-	 * @see FileHandler#FileHandler(java.lang.String)
-	 * @see Level#ALL
-	 */
-	public boolean addFileHandler (String filenamePattern) {
-		boolean isSuccess = false;
-
-		if (filenamePattern != null) {
-			FileHandler fh = null;
-			try {
-				fh = new FileHandler (filenamePattern, true);
-			} catch (IOException ex) {
-				Logger.getLogger (LoggerWrapper.class.getName ()).log (Level.SEVERE, null, ex);
-			} catch (SecurityException ex) {
-				Logger.getLogger (LoggerWrapper.class.getName ()).log (Level.SEVERE, null, ex);
-			}
-
-			if (fh != null) {
-				fh.setLevel (defaultLevel);
-				fh.setFormatter (new LoggerFormatter ());
-				logger.addHandler (fh);
-				isSuccess = true;
-			} else {
-				isSuccess = false;
-			}
-		}
-
-		return isSuccess;
-	}
-
-	/**
-	 * Add a console handler to the linked logger with ALL logging level
-	 *
-	 * @see FileHandler
-	 * @see FileHandler#FileHandler(java.lang.String)
-	 * @see Level#ALL
-	 */
-	public void addConsoleHandler () {
-		ConsoleHandler ch = null;
-		ch = new ConsoleHandler ();
-		ch.setLevel (defaultLevel);
-		ch.setFormatter (new LoggerFormatter ());
-		logger.addHandler (ch);
-	}
-
-	public void addWriteToLog4jHandler () {
-		WriteJulToLog4jHandler log4jHandler = null;
-		log4jHandler = new WriteJulToLog4jHandler ();
-		log4jHandler.setLevel (defaultLevel);
-		log4jHandler.setFormatter (new LoggerFormatter ());
-		logger.addHandler (log4jHandler);
-	}
-
+	
 	/**
 	 * Log a method entry.
 	 * <p>
@@ -334,7 +121,7 @@ public class LoggerWrapper {
 	 * <p>
 	 */
 	public void entering () {
-		StackTraceElement caller = LogHelperUtil.getCallerStackTraceElement ();
+		StackTraceElement caller = StackTraceUtils.getCallerStackTraceElement ();
 		logger.entering (caller.getClassName (), caller.getMethodName ());
 	}
 
@@ -351,7 +138,7 @@ public class LoggerWrapper {
 	 * @param methodParams array of parameters to the method being entered
 	 */
 	public void entering (Object... methodParams) {
-		StackTraceElement caller = LogHelperUtil.getCallerStackTraceElement ();
+		StackTraceElement caller = StackTraceUtils.getCallerStackTraceElement ();
 		logger.entering (caller.getClassName (), caller.getMethodName (), methodParams);
 	}
 
@@ -364,7 +151,7 @@ public class LoggerWrapper {
 	 * <p>
 	 */
 	public void exiting () {
-		StackTraceElement caller = LogHelperUtil.getCallerStackTraceElement ();
+		StackTraceElement caller = StackTraceUtils.getCallerStackTraceElement ();
 		logger.exiting (caller.getClassName (), caller.getMethodName ());
 	}
 
@@ -380,7 +167,7 @@ public class LoggerWrapper {
 	 * @param result Object that is being returned
 	 */
 	public void exiting (Object result) {
-		StackTraceElement caller = LogHelperUtil.getCallerStackTraceElement ();
+		StackTraceElement caller = StackTraceUtils.getCallerStackTraceElement ();
 		logger.exiting (caller.getClassName (), caller.getMethodName (), result);
 	}
 
@@ -442,7 +229,7 @@ public class LoggerWrapper {
 	 * java.lang.Throwable)
 	 */
 	public void throwing (Throwable t) {
-		StackTraceElement caller = LogHelperUtil.getCallerStackTraceElement ();
+		StackTraceElement caller = StackTraceUtils.getCallerStackTraceElement ();
 		if (caller != null) {
 			logger.throwing (caller.getClassName (), caller.getMethodName () + "():" + caller.getLineNumber (), t);
 		} else {
@@ -472,7 +259,7 @@ public class LoggerWrapper {
 	 * java.lang.String, java.lang.String, java.lang.Throwable)
 	 */
 	public void throwing (String msg, Throwable t) {
-		StackTraceElement caller = LogHelperUtil.getCallerStackTraceElement ();
+		StackTraceElement caller = StackTraceUtils.getCallerStackTraceElement ();
 		if (caller != null) {
 			logger.logp (Level.FINER, caller.getClassName (), caller.getMethodName () + "():" + caller.getLineNumber (), msg, t);
 		} else {
@@ -492,7 +279,7 @@ public class LoggerWrapper {
 	 * @param msg The string message (or a key in the message catalog)
 	 */
 	public void severe (String msg) {
-		StackTraceElement caller = LogHelperUtil.getCallerStackTraceElement ();
+		StackTraceElement caller = StackTraceUtils.getCallerStackTraceElement ();
 		if (caller != null) {
 			logger.logp (Level.SEVERE, caller.getClassName (), caller.getMethodName () + "():" + caller.getLineNumber (), msg);
 		} else {
@@ -512,7 +299,7 @@ public class LoggerWrapper {
 	 * @param msg The string message (or a key in the message catalog)
 	 */
 	public void warning (String msg) {
-		StackTraceElement caller = LogHelperUtil.getCallerStackTraceElement ();
+		StackTraceElement caller = StackTraceUtils.getCallerStackTraceElement ();
 		if (caller != null) {
 			logger.logp (Level.WARNING, caller.getClassName (), caller.getMethodName () + "():" + caller.getLineNumber (), msg);
 		} else {
@@ -532,7 +319,7 @@ public class LoggerWrapper {
 	 * @param msg The string message (or a key in the message catalog)
 	 */
 	public void info (String msg) {
-		StackTraceElement caller = LogHelperUtil.getCallerStackTraceElement ();
+		StackTraceElement caller = StackTraceUtils.getCallerStackTraceElement ();
 		if (caller != null) {
 			logger.logp (Level.INFO, caller.getClassName (), caller.getMethodName () + "():" + caller.getLineNumber (), msg);
 		} else {
@@ -552,7 +339,7 @@ public class LoggerWrapper {
 	 * @param msg The string message (or a key in the message catalog)
 	 */
 	public void config (String msg) {
-		StackTraceElement caller = LogHelperUtil.getCallerStackTraceElement ();
+		StackTraceElement caller = StackTraceUtils.getCallerStackTraceElement ();
 		if (caller != null) {
 			logger.logp (Level.CONFIG, caller.getClassName (), caller.getMethodName () + "():" + caller.getLineNumber (), msg);
 		} else {
@@ -572,7 +359,7 @@ public class LoggerWrapper {
 	 * @param msg The string message (or a key in the message catalog)
 	 */
 	public void fine (String msg) {
-		StackTraceElement caller = LogHelperUtil.getCallerStackTraceElement ();
+		StackTraceElement caller = StackTraceUtils.getCallerStackTraceElement ();
 		if (caller != null) {
 			logger.logp (Level.FINE, caller.getClassName (), caller.getMethodName () + "():" + caller.getLineNumber (), msg);
 		} else {
@@ -592,7 +379,7 @@ public class LoggerWrapper {
 	 * @param msg The string message (or a key in the message catalog)
 	 */
 	public void finer (String msg) {
-		StackTraceElement caller = LogHelperUtil.getCallerStackTraceElement ();
+		StackTraceElement caller = StackTraceUtils.getCallerStackTraceElement ();
 		if (caller != null) {
 			logger.logp (Level.FINER, caller.getClassName (), caller.getMethodName () + "():" + caller.getLineNumber (), msg);
 		} else {
@@ -612,7 +399,7 @@ public class LoggerWrapper {
 	 * @param msg The string message (or a key in the message catalog)
 	 */
 	public void finest (String msg) {
-		StackTraceElement caller = LogHelperUtil.getCallerStackTraceElement ();
+		StackTraceElement caller = StackTraceUtils.getCallerStackTraceElement ();
 		if (caller != null) {
 			logger.logp (Level.FINEST, caller.getClassName (), caller.getMethodName () + "():" + caller.getLineNumber (), msg);
 		} else {
@@ -629,7 +416,7 @@ public class LoggerWrapper {
 	 * @see NodeList
 	 */
 	public void logDomNodeList (String msg, NodeList nodeList) {
-		StackTraceElement caller = LogHelperUtil.getCallerStackTraceElement ();
+		StackTraceElement caller = StackTraceUtils.getCallerStackTraceElement ();
 
 		String toLog = (msg != null ? msg + "\n" : "DOM nodelist:\n");
 		for (int i = 0; i < nodeList.getLength (); i++) {
@@ -646,20 +433,43 @@ public class LoggerWrapper {
 	/**
 	 * Log a DOM node at the FINER level
 	 *
-	 * @param msg The message to show with the node, or null if no message
-	 * needed
+	 * @param msg The message to show with the node, or null if no message needed
 	 * @param node
 	 * @see Node
 	 */
 	public void logDomNode (String msg, Node node) {
-		StackTraceElement caller = LogHelperUtil.getCallerStackTraceElement ();
-
+		StackTraceElement caller = StackTraceUtils.getCallerStackTraceElement ();
+		
+		logDomNode (msg, node, Level.FINER, caller);
+	}
+	
+	/**
+	 * Log a DOM node at a given logging level
+	 * @param msg The message to show with the node, or null if no message needed
+	 * @param node
+	 * @param level 
+	 */
+	public void logDomNode (String msg, Node node, Level level) {
+		StackTraceElement caller = StackTraceUtils.getCallerStackTraceElement ();
+		
+		logDomNode (msg, node, level, caller);
+	}
+	
+	/**
+	 * Log a DOM node at a given logging level and a specified caller
+	 * @param msg The message to show with the node, or null if no message needed
+	 * @param node
+	 * @param level
+	 * @param caller The caller's stack trace element
+	 * @see ru.dmerkushov.loghelper.StackTraceUtils#getMyStackTraceElement() 
+	 */
+	public void logDomNode (String msg, Node node, Level level, StackTraceElement caller) {
 		String toLog = (msg != null ? msg + "\n" : "DOM node:\n") + domNodeDescription (node, 0);
 
 		if (caller != null) {
-			logger.logp (Level.FINER, caller.getClassName (), caller.getMethodName () + "():" + caller.getLineNumber (), toLog);
+			logger.logp (level, caller.getClassName (), caller.getMethodName () + "():" + caller.getLineNumber (), toLog);
 		} else {
-			logger.logp (Level.FINER, "(UnknownSourceClass)", "(unknownSourceMethod)", toLog);
+			logger.logp (level, "(UnknownSourceClass)", "(unknownSourceMethod)", toLog);
 		}
 	}
 
@@ -735,62 +545,7 @@ public class LoggerWrapper {
 		for (Handler handler : logger.getHandlers ()) {
 			handler.setLevel (level);
 		}
-
-		log4jLogger.setLevel (getLog4jLevelFromJUL (level));
-
 	}
 
-	/**
-	 * Get a Log4j logging level the same as given JUL level
-	 *
-	 * @param level
-	 * @return
-	 */
-	public static org.apache.log4j.Level getLog4jLevelFromJUL (java.util.logging.Level level) {
-		org.apache.log4j.Level log4jLevel;
-		if ((level.intValue () >= Level.SEVERE.intValue ()) && (level.intValue () < Level.OFF.intValue ())) {
-			log4jLevel = org.apache.log4j.Level.ERROR;
-		} else if (level.intValue () >= Level.WARNING.intValue ()) {
-			log4jLevel = org.apache.log4j.Level.WARN;
-		} else if (level.intValue () >= Level.INFO.intValue ()) {
-			log4jLevel = org.apache.log4j.Level.INFO;
-		} else if (level.intValue () >= Level.CONFIG.intValue ()) {
-			log4jLevel = org.apache.log4j.Level.DEBUG;
-		} else if (level.intValue () >= Level.FINEST.intValue ()) {
-			log4jLevel = org.apache.log4j.Level.TRACE;
-		} else if (level.intValue () < Level.FINEST.intValue ()) {
-			log4jLevel = org.apache.log4j.Level.ALL;
-		} else {
-			log4jLevel = org.apache.log4j.Level.OFF;
-		}
-		return log4jLevel;
-	}
 
-	/**
-	 * Get a JUL logging level the same as given Log4j level
-	 *
-	 * @param log4jLevel
-	 * @return
-	 */
-	public static Level getJULLevelFromLog4j (org.apache.log4j.Level log4jLevel) {
-		int log4jLevelInt = log4jLevel.toInt ();
-		Level julLevel;
-		if (log4jLevelInt >= org.apache.log4j.Level.FATAL_INT) {
-			julLevel = Level.SEVERE;
-		} else if (log4jLevelInt >= org.apache.log4j.Level.ERROR_INT) {
-			julLevel = Level.SEVERE;
-		} else if (log4jLevelInt >= org.apache.log4j.Level.WARN_INT) {
-			julLevel = Level.WARNING;
-		} else if (log4jLevelInt >= org.apache.log4j.Level.INFO_INT) {
-			julLevel = Level.INFO;
-		} else if (log4jLevelInt >= org.apache.log4j.Level.DEBUG_INT) {
-			julLevel = Level.FINE;
-		} else if (log4jLevelInt >= org.apache.log4j.Level.TRACE_INT) {
-			julLevel = Level.FINER;
-		} else {
-			julLevel = Level.FINEST;
-		}
-
-		return julLevel;
-	}
 }

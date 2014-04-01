@@ -19,42 +19,68 @@ package ru.dmerkushov.loghelper;
 import ru.dmerkushov.loghelper.formatter.LoggerFormatter;
 
 /**
- *
+ * This class should only be used by log-helper classes and theit derivatives.
+ * It enables log-helper classes of outputting debug and error messages to System.out and System.err, respectively.
+ * Note that since the size of the messages is not limited, a one should consider redirecting output when debugging log-helper.
  * @author Dmitriy Merkushov
  */
 public class LogHelperDebug {
 	
 	static boolean debugEnabled = false;
 	
+	/**
+	 * Set the debug enabled flag.
+	 * @param debugEnabled 
+	 */
 	public static synchronized void setDebugEnabled (boolean debugEnabled) {
 		LogHelperDebug.debugEnabled = debugEnabled;
 	}
 
+	/**
+	 * Check the debug enabled flag
+	 * @return 
+	 */
 	public static boolean isDebugEnabled () {
 		return debugEnabled;
 	}
 	
-	public static void printMessage (String message) {
-		if (isDebugEnabled ()) {
+	/**
+	 * Print a message to {@link System.out}, with an every-line prefix: "log-helper DEBUG: "
+	 * @param message
+	 * @param force <code>true</code> if we need to override the debug enabled flag (i.e. the message is REALLY important), <code>false</code> otherwise
+	 */
+	public static void printMessage (String message, boolean force) {
+		if (isDebugEnabled () || force) {
 			String toOutput = "log-helper DEBUG: " + message.replaceAll ("\n", "\nlog-helper DEBUG: ");
 			System.out.println (toOutput);
 		}
 	}
 	
-	public static void printError (String message) {
-		if (isDebugEnabled ()) {
+	/**
+	 * Print a message to {@link System.err}, with an every-line prefix: "log-helper ERROR: "
+	 * @param message
+	 * @param force <code>true</code> if we need to override the debug enabled flag (i.e. the message is REALLY important), <code>false</code> otherwise
+	 */
+	public static void printError (String message, boolean force) {
+		if (isDebugEnabled () || force) {
 			String toOutput = "log-helper ERROR: " + message.replaceAll ("\n", "\nlog-helper ERROR: ");
 			System.err.println (toOutput);
 		}
 	}
 	
-	public static void printError (String message, Throwable throwable) {
-		if (isDebugEnabled ()) {
+	/**
+	 * Print a message to {@link System.err}, with an every-line prefix: "log-helper ERROR: ", and specifying a full stack trace of a {@link java.lang.Throwable Throwable{
+	 * @param message
+	 * @param throwable
+	 * @param force <code>true</code> if we need to override the debug enabled flag (i.e. the message is REALLY important), <code>false</code> otherwise
+	 */
+	public static void printError (String message, Throwable throwable, boolean force) {
+		if (isDebugEnabled () || force) {
 			StringBuilder outputBuilder = new StringBuilder ();
 			outputBuilder.append (message).append ("\nThrowable:\n");
 			outputBuilder.append (LoggerFormatter.getFullThrowableMsg (throwable));
 			String fullMessage = outputBuilder.toString ();
-			printError (fullMessage);
+			printError (fullMessage, force);
 		}
 	}
 }

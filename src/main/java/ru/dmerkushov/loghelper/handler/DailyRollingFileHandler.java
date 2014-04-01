@@ -27,6 +27,10 @@ public class DailyRollingFileHandler extends StreamHandler {
 	private long unique = 0;
 	private FileOutputStream fos;
 	private File file;
+	/**
+	 * Default log filename pattern, namely "log_%d_%u"
+	 */
+	public static final String DEFAULT_LOG_FILENAME_PATTERN = "log_%d_%u";
 
 	/**
 	 * Get the filename pattern of the log file, as it was supplied to the {@link ru.dmerkushov.loghelper.handler.DailyRollingFileHandler#DailyRollingFileHandler(java.lang.String) constructor}
@@ -82,10 +86,11 @@ public class DailyRollingFileHandler extends StreamHandler {
 	 *
 	 * @throws IOException
 	 * @see DailyRollingFileHandler#DailyRollingFileHandler(java.lang.String)
+	 * @see DailyRollingFileHandler#DEFAULT_LOG_FILENAME_PATTERN
 	 */
 	public DailyRollingFileHandler () throws IOException {
 		super ();
-		this.pattern = "log_%d_%u";
+		this.pattern = DEFAULT_LOG_FILENAME_PATTERN;
 		this.previousFilename = generateFilename (new java.util.Date ());
 	}
 
@@ -95,15 +100,20 @@ public class DailyRollingFileHandler extends StreamHandler {
 	 * @param pattern The pattern of the file name, containing <code>%d</code>
 	 * to indicate the place of the date in the file name, and <code>%u</code>
 	 * to indicate the place of a unique numeric identifier. The date will be
-	 * formatted as <code>yyyy-MM-dd</code> 	 * for <code>SimpleDateFormat</code>.<br> If no <code>%d</code> is
+	 * formatted as <code>yyyy-MM-dd</code> for <code>SimpleDateFormat</code>.<br> If no <code>%d</code> is
 	 * found, the date is added at the end of the filename. The same
-	 * about <code>%u</code>.
+	 * about <code>%u</code>.<br> If <code>pattern</code> is <code>null</code>, it is initialized to a default value.
 	 * @throws IOException if could not open the file for appending
 	 * @throws IllegalArgumentException if the pattern is illegal
 	 * @see SimpleDateFormat
+	 * @see DailyRollingFileHandler#DEFAULT_LOG_FILENAME_PATTERN
 	 */
 	public DailyRollingFileHandler (String pattern) throws IllegalArgumentException, IOException {
 		super ();
+		
+		if (pattern == null) {
+			pattern = DEFAULT_LOG_FILENAME_PATTERN;
+		}
 
 		if (pattern.length () < 1) {
 			throw new IllegalArgumentException ("Pattern length is less than 1");

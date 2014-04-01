@@ -57,6 +57,10 @@ public class SizeRollingFileHandler extends Handler {
 	 */
 	public SizeRollingFileHandler (String pattern, long maxLogSize) {
 		super ();
+		
+		if (pattern == null) {
+			pattern = DEFAULT_LOG_FILENAME_PATTERN;
+		}
 
 		if (pattern.length () < 1) {
 			throw new IllegalArgumentException ("Pattern length is less than 1");
