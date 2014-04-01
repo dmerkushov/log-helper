@@ -546,6 +546,16 @@ public class LoggerWrapper {
 			handler.setLevel (level);
 		}
 	}
+	
+	/**
+	 * 
+	 * @param name
+	 * @return 
+	 * @deprecated Use {@link LogHelper#getLoggerWrapper(java.lang.String) } instead
+	 */
+	public static LoggerWrapper getLoggerWrapper (String name) {
+		return LogHelper.getLoggerWrapper (name);
+	}
 
 
 }
