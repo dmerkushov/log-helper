@@ -19,7 +19,7 @@ import java.io.IOException;
 import org.w3c.dom.Node;
 import ru.dmerkushov.loghelper.LogHelperDebug;
 import ru.dmerkushov.loghelper.LoggerWrapper;
-import ru.dmerkushov.loghelper.formatter.LoggerFormatter;
+import ru.dmerkushov.loghelper.formatter.DefaultFormatter;
 import ru.dmerkushov.loghelper.handler.DailyRollingFileHandler;
 
 /**
@@ -66,7 +66,7 @@ public class DefaultDailyRollingConfigurator extends LoggerWrapperConfigurator {
 			success = false;
 		}
 
-		drfh.setFormatter (new LoggerFormatter ());
+		drfh.setFormatter (new DefaultFormatter ());
 
 		if (drfh != null) {
 			loggerWrapper.addLoggerHandler (drfh);

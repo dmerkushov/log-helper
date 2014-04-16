@@ -19,7 +19,7 @@ package ru.dmerkushov.loghelper.configure.loggerwrapper;
 import java.util.logging.ConsoleHandler;
 import org.w3c.dom.Node;
 import ru.dmerkushov.loghelper.LoggerWrapper;
-import ru.dmerkushov.loghelper.formatter.LoggerFormatter;
+import ru.dmerkushov.loghelper.formatter.DefaultFormatter;
 
 /**
  *
@@ -34,7 +34,7 @@ public class ConsoleConfigurator extends LoggerWrapperConfigurator {
 	@Override
 	public boolean configure () {
 		ConsoleHandler consoleHandler = new ConsoleHandler ();
-		consoleHandler.setFormatter (new LoggerFormatter ());
+		consoleHandler.setFormatter (new DefaultFormatter ());
 		
 		loggerWrapper.addLoggerHandler (consoleHandler);
 

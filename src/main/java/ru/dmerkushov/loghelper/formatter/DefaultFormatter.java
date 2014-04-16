@@ -12,7 +12,7 @@ import java.util.logging.LogRecord;
  *
  * @author Dmitriy Merkushov
  */
-public class LoggerFormatter extends Formatter {
+public class DefaultFormatter extends Formatter {
 
 	static SimpleDateFormat sdf = new SimpleDateFormat ("yyyy-MM-dd HH:mm:ss.S Z");
 

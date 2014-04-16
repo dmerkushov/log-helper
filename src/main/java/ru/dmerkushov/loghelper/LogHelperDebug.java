@@ -16,7 +16,7 @@
 
 package ru.dmerkushov.loghelper;
 
-import ru.dmerkushov.loghelper.formatter.LoggerFormatter;
+import ru.dmerkushov.loghelper.formatter.DefaultFormatter;
 
 /**
  * This class should only be used by log-helper classes and theit derivatives.
@@ -45,7 +45,7 @@ public class LogHelperDebug {
 	}
 	
 	/**
-	 * Print a message to {@link System.out}, with an every-line prefix: "log-helper DEBUG: "
+	 * Print a message to <code>System.out</code>, with an every-line prefix: "log-helper DEBUG: "
 	 * @param message
 	 * @param force <code>true</code> if we need to override the debug enabled flag (i.e. the message is REALLY important), <code>false</code> otherwise
 	 */
@@ -57,7 +57,7 @@ public class LogHelperDebug {
 	}
 	
 	/**
-	 * Print a message to {@link System.err}, with an every-line prefix: "log-helper ERROR: "
+	 * Print a message to <code>System.err</code>, with an every-line prefix: "log-helper ERROR: "
 	 * @param message
 	 * @param force <code>true</code> if we need to override the debug enabled flag (i.e. the message is REALLY important), <code>false</code> otherwise
 	 */
@@ -69,7 +69,7 @@ public class LogHelperDebug {
 	}
 	
 	/**
-	 * Print a message to {@link System.err}, with an every-line prefix: "log-helper ERROR: ", and specifying a full stack trace of a {@link java.lang.Throwable Throwable{
+	 * Print a message to <code>System.err</code>, with an every-line prefix: "log-helper ERROR: ", and specifying a full stack trace of a {@link java.lang.Throwable Throwable}
 	 * @param message
 	 * @param throwable
 	 * @param force <code>true</code> if we need to override the debug enabled flag (i.e. the message is REALLY important), <code>false</code> otherwise
@@ -78,7 +78,7 @@ public class LogHelperDebug {
 		if (isDebugEnabled () || force) {
 			StringBuilder outputBuilder = new StringBuilder ();
 			outputBuilder.append (message).append ("\nThrowable:\n");
-			outputBuilder.append (LoggerFormatter.getFullThrowableMsg (throwable));
+			outputBuilder.append (DefaultFormatter.getFullThrowableMsg (throwable));
 			String fullMessage = outputBuilder.toString ();
 			printError (fullMessage, force);
 		}

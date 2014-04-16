@@ -37,11 +37,11 @@ public class DefaultSizeRollingConfigurator extends LoggerWrapperConfigurator {
 	 * <li><code>ru.dmerkushov.loghelper.SizeRollingFileHandler.pattern</code> set to the desired SizeRollingFileHandler log file name pattern.</li>
 	 * <li><code>ru.dmerkushov.loghelper.SizeRollingFileHandler.maxLogSize</code> set to the desired SizeRollingFileHandler maximum log size (decimal number). By default, the size is set in bytes, but the value may end with "K" to indicate that the size is set in KiB, "M" (MiB), "G" (GiB), or "T" (TiB).</li>
 	 * </ul>
-	 * If the configuration options do not contain any of the options, SizeRollingFileHandler's default are used.
+	 * If the configuration options do not contain any of the options, SizeRollingFileHandler's defaults are used.
 	 * 
 	 * @param loggerWrapper
 	 * @param configuration 
-	 * @see LoggerWrapperConfigurator#LoggerWrapperConfigurator(ru.dmerkushov.loghelper.LoggerWrapper, java.util.Properties) 
+	 * @see LoggerWrapperConfigurator#LoggerWrapperConfigurator(ru.dmerkushov.loghelper.LoggerWrapper, org.w3c.dom.Node)
 	 */
 	public DefaultSizeRollingConfigurator (LoggerWrapper loggerWrapper, Node configuration) {
 		super (loggerWrapper, configuration);

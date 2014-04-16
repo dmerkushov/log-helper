@@ -13,7 +13,7 @@ import java.util.logging.ErrorManager;
 import java.util.logging.Formatter;
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
-import ru.dmerkushov.loghelper.formatter.LoggerFormatter;
+import ru.dmerkushov.loghelper.formatter.DefaultFormatter;
 
 /**
  *
@@ -147,17 +147,17 @@ public class SizeRollingFileHandler extends Handler {
 	/**
 	 * Return the <tt>Formatter</tt> for this <tt>Handler</tt>. If the
 	 * superclass's getFormatter () method returns null, creates a new
-	 * <tt>LoggerFormatter</tt> instance and sets it as the formatter.
+	 * <tt>DefaultFormatter</tt> instance and sets it as the formatter.
 	 *
 	 * @return the <tt>Formatter</tt> (may <b>not</b> be null).
 	 * @see Formatter
-	 * @see LoggerFormatter
+	 * @see DefaultFormatter
 	 */
 	@Override
 	public Formatter getFormatter () {
 		Formatter formatter = super.getFormatter ();
 		if (formatter == null) {
-			formatter = new LoggerFormatter ();
+			formatter = new DefaultFormatter ();
 			setFormatter (formatter);
 		}
 

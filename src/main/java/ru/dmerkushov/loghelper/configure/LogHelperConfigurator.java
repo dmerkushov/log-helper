@@ -135,7 +135,7 @@ public class LogHelperConfigurator {
 	}
 
 	/**
-	 * Configure the log-helper library to the values of a DOM node. Details are described in the {@link LogHelperConfigurator LogHelperConfigurator class Javadoc}. If the configuration does not touch Apache Log4j, Log4j is initialized by its {@link org.apache.log4j.BasicConfigurator BasicConfigurator}
+	 * Configure the log-helper library to the values of a DOM node. Details are described in the {@link ru.dmerkushov.loghelper.configure.LogHelperConfigurator LogHelperConfigurator class Javadoc}.
 	 *
 	 * @param configNode
 	 * @return always <code>true</code> (means the call is ever succesful)
