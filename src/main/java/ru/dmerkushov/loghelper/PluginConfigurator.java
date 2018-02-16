@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package ru.dmerkushov.loghelper.configure;
+package ru.dmerkushov.loghelper;
 
 import org.w3c.dom.Node;
 import ru.dmerkushov.loghelper.LogHelperDebug;

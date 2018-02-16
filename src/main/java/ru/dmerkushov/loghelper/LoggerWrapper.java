@@ -19,7 +19,11 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.HashSet;
 import java.util.Properties;
+import java.util.Set;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Formatter;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -33,7 +37,7 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-import ru.dmerkushov.loghelper.configure.LogHelperConfigurator;
+import ru.dmerkushov.loghelper.formatter.DefaultFormatter;
 
 /**
  * Class that slightly extends the functionality of
@@ -50,16 +54,44 @@ import ru.dmerkushov.loghelper.configure.LogHelperConfigurator;
 public class LoggerWrapper {
 
 	Logger logger;
-	protected Level defaultLevel = Level.ALL;
+	protected static Level defaultLevel = Level.ALL;
+	protected static Set<Handler> defaultHandlers = new HashSet<Handler> ();
+	protected static boolean configuredByDefault = false;
+	protected static Formatter defaultFormatter = new DefaultFormatter ();
 	String name;
 
 	static {
 		LogHelperConfigurator.configure ();
+
+		defaultHandlers.add (new ConsoleHandler ());
+	}
+
+	/**
+	 * @deprecated Use {@link LogHelperConfigurator#configureByDefault(boolean)}
+	 * instead
+	 * @param filenamePattern
+	 */
+	public void configureByDefault (String filenamePattern) {
+		LogHelperConfigurator.configureByDefault (false);
 	}
 
 	protected LoggerWrapper (String name) {
 		logger = Logger.getLogger (name);
-		logger.setLevel (defaultLevel);
+
+		if (configuredByDefault) {
+			for (Handler handler : defaultHandlers) {
+				handler.setFormatter (defaultFormatter);
+				logger.addHandler (handler);
+				handler.setLevel (defaultLevel);
+			}
+			Handler[] totalHandlers = logger.getHandlers ();	// Handlers are removed later than added because the original JUL forcibly leaves at least one handler for a logger
+			for (Handler handler : totalHandlers) {
+				if (!defaultHandlers.contains (handler)) {
+					logger.removeHandler (handler);
+				}
+			}
+			logger.setLevel (defaultLevel);
+		}
 
 		this.name = name;
 
@@ -276,7 +308,7 @@ public class LoggerWrapper {
 	}
 
 	/**
-	 * Log a Throwable at Level.FINER, with associated Throwable information.
+	 * Log a Throwable at Level.WARNING (as opposed to JUL's Level.FINER).
 	 * <p>
 	 * This is a convenience method to log that a method is terminating by
 	 * throwing an exception. The logging is done using the FINER level.
@@ -298,15 +330,16 @@ public class LoggerWrapper {
 	public void throwing (Throwable t) {
 		StackTraceElement caller = StackTraceUtils.getCallerStackTraceElement ();
 		if (caller != null) {
-			logger.throwing (caller.getClassName (), caller.getMethodName () + "():" + caller.getLineNumber (), t);
+			logger.logp (Level.WARNING, caller.getClassName (), caller.getMethodName () + "():" + caller.getLineNumber (), null, t);
 		} else {
-			logger.throwing ("(UnknownSourceClass)", "(unknownSourceMethod)", t);
+			logger.logp (Level.WARNING, "(UnknownSourceClass)", "(unknownSourceMethod)", null, t);
 		}
 
 	}
 
 	/**
-	 * Log a message at Level.FINER, with associated Throwable information.
+	 * Log a message at Level.WARNING (as opposed to JUL's Level.FINER), with an
+	 * associated message.
 	 * <p>
 	 * If the logger is currently enabled for Level.FINER then the given
 	 * arguments are stored in a LogRecord which is forwarded to all registered
@@ -328,9 +361,9 @@ public class LoggerWrapper {
 	public void throwing (String msg, Throwable t) {
 		StackTraceElement caller = StackTraceUtils.getCallerStackTraceElement ();
 		if (caller != null) {
-			logger.logp (Level.FINER, caller.getClassName (), caller.getMethodName () + "():" + caller.getLineNumber (), msg, t);
+			logger.logp (Level.WARNING, caller.getClassName (), caller.getMethodName () + "():" + caller.getLineNumber (), msg, t);
 		} else {
-			logger.logp (Level.FINER, "(UnknownSourceClass)", "(unknownSourceMethod)", msg, t);
+			logger.logp (Level.WARNING, "(UnknownSourceClass)", "(unknownSourceMethod)", msg, t);
 		}
 	}
 
@@ -644,7 +677,6 @@ public class LoggerWrapper {
 	 */
 	public void setLevel (Level level) {
 
-		this.defaultLevel = level;
 		logger.setLevel (level);
 		for (Handler handler : logger.getHandlers ()) {
 			handler.setLevel (level);
@@ -660,6 +692,10 @@ public class LoggerWrapper {
 	 */
 	public static LoggerWrapper getLoggerWrapper (String name) {
 		return LogHelper.getLoggerWrapper (name);
+	}
+
+	static void setConfiguredByDefault () {
+		configuredByDefault = true;
 	}
 
 }
